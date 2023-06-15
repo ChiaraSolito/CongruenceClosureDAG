@@ -1,5 +1,6 @@
 from src import DAG
 from src import Parser
+from src import SmtParser
 import sys
 import time
 
@@ -15,16 +16,19 @@ def main(name:str):
     else:
         file = "data/" + name
 
-    if not file.endswith(".txt"): 
-        print("ERROR: file are accepted in the form of text files only! Please check your input.")
+    if (not file.endswith(".txt")) or (not file.endswith('.smt2')): 
+        print("ERROR: file are accepted in the form of text files or smt2 format only! Please check your input.")
         exit()
 
     #instantiate classes
     solver = DAG()
-    parser = Parser()
-
-    input = process(file)
-    parsed_input = parser.parse(input)
+    if file.endswith('.smt2'):
+        parser = SmtParser()
+        parsed_input = parser.parse(file)
+    else:
+        parser = Parser()
+        input = process(file)
+        parsed_input = parser.parse(input)
 
 
 if __name__ == "__main__":
