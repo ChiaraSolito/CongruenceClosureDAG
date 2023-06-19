@@ -1,9 +1,8 @@
 import networkx as nx 
 import itertools 
+from uuid import uuid4
 
 class DAG: 
-
-    newid = itertools.count().next
 
     def __init__(self): 
         self.g = nx.DiGraph()
@@ -11,11 +10,15 @@ class DAG:
         self.inequalities = []
 
     def add_node(self, fn, args:list):
-        id = self.newid()
+        id = uuid4()
         m_ccpar = set()
         m_find = []
         m_find.append(id)
         self.g.add_node(id,fn=fn, args=args, m_find=m_find,m_ccpar=m_ccpar)
+        return id 
+    
+    def add_edge(self,node1,node2):
+        return self.g.add_edge(node1, node2)
     
     def node(self, i:int):
         return self.g.nodes[i]
