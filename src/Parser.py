@@ -1,9 +1,6 @@
 import re
 from DAG import DAG
 from pyparsing import nestedExpr
-import matplotlib.pyplot as plt
-import networkx as nx
-from networkx.drawing.nx_pydot import graphviz_layout
 
 class Parser:
 
@@ -34,7 +31,7 @@ class Parser:
             self.eq.append(couple)
 
         else:
-            self.parse_expression(data)
+            self.parse_expression("(" + data + ")")
 
     def parse(self,list_elements:list):
         nodes = []
@@ -63,14 +60,10 @@ class Parser:
         list_nested = expr.parseString(expression).as_list()
         self.parse(list_nested[0])
 
-    def print_graph(self):
-        labels = nx.get_node_attributes(self.dag.g, 'fn') 
-        nx.draw(self.dag.g, labels=labels, font_weight='bold')
-        plt.show() 
-
 # Test dell'esempio
-expression = "f(f(a,b),b)=f(a,b),g(a)"
+expression = "f(f(a,b),b)"
 dag = DAG()
 parser = Parser(dag)
 graph = parser.parse_equations(expression)
-parser.print_graph()
+dag.simplify()
+dag.print_graph()

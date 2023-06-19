@@ -1,6 +1,7 @@
 import networkx as nx 
-import itertools 
 from uuid import uuid4
+import matplotlib.pyplot as plt
+from networkx.drawing.nx_pydot import graphviz_layout
 
 class DAG: 
 
@@ -67,6 +68,28 @@ class DAG:
                     if self.find(t1) != self.find(t2) or self.congruent(t1,t2):
                         self.merge(t1,t2)
         return 
+    
+    def simplify(self):
+        fns = [self.g.nodes[node]['fn'] for node in self.g.nodes]
+        for fn in fns:
+            leaves = [node for node in self.g.nodes if self.g.out_degree(node) == 0 and self.g.nodes[node]["fn"] == fn]
+
+            if len(leaves)>1:
+                newid = self.add_node(fn,[])
+
+                predecessors = set()
+                for node in leaves:
+                    predecessors.update(self.g.predecessors(node))
+                    self.g.remove_node(node)
+
+                for predecessor in predecessors:
+                    self.g.add_edge(predecessor, newid)
+
+    def print_graph(self):
+        labels = nx.get_node_attributes(self.g, 'fn') 
+        pos = graphviz_layout(self.g, prog="dot")
+        nx.draw(self.g, pos, labels=labels, font_weight='bold')
+        plt.show() 
 
 
 
