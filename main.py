@@ -28,7 +28,7 @@ def main(name:str):
     else:
         parser = Parser()
         input = process(file)
-        parsed_input = parser.parse(input)
+        parsed_input = parser.parse_equations(input)
 
 
 if __name__ == "__main__":
