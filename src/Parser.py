@@ -1,48 +1,76 @@
 import re
-from src import DAG
+from DAG import DAG
+from pyparsing import nestedExpr
+import matplotlib.pyplot as plt
+import networkx as nx
+from networkx.drawing.nx_pydot import graphviz_layout
 
 class Parser:
 
-    def __init__(self, data, dag: DAG):
+    def __init__(self, dag: DAG):
         self.atom_dict = {}
-        self.priginal_data = data
+        #self.original_data = data
         self.dag = dag
         self.diseq = []
         self.eq = []
 
     def parse_equations(self, data):
 
-        for element in data:
+        if "!=" in data:
 
-            if "!=" in element:
+            couple = re.split('!=', data)
 
-                couple = re.split('!=', element)
-                self.dag.add_node(couple[0])
-                self.dag.add_node(couple[1])
+            self.parse_expression("(" + couple[0] + ")")
+            self.parse_expression("(" + couple[1] + ")")
 
-                couple[0] = hash(couple[0].strip())
-                couple[1] = hash(couple[1].strip())
+            self.diseq.append(couple)
 
-                self.diseq.append(couple)
+        elif "=" in data:
+            couple = re.split('=', data)
 
-            elif "=" in element:
-                couple = re.split('=', element)
+            self.parse_expression("(" + couple[0] + ")")
+            self.parse_expression("(" + couple[1] + ")")
 
-                self.dag.add_node(couple[0])
-                self.dag.add_node(couple[1])
+            self.eq.append(couple)
 
-                couple[0] = hash(couple[0].strip())
-                couple[1] = hash(couple[1].strip())
+        else:
+            self.parse_expression(data)
 
-                self.eq.append(couple)
+    def parse(self,list_elements:list):
+        nodes = []
+
+        for element in list_elements:
+            print(f"element: {element}")
+            if isinstance(element,str):
+
+                nodes.append(self.dag.add_node(element,[]))
 
             else:
-                self.add_node(element)
-                self.add_node("tt")
-                couple[0] = hash(element.strip())
-                couple[1] = hash("tt")
+                parent = nodes[-1]
+                print(f"parent: {parent}")
 
-                self.eq.append(couple)
+                nodes2 = self.parse(element)
 
-    def parse(self, data):
-        return
+                for node in nodes2:
+                    self.dag.add_edge(parent,node)
+
+        return nodes
+
+    def parse_expression(self,expression:str):
+        expr = nestedExpr()  
+        expression = expression.replace("," , " ")
+        print(expression)
+        list_nested = expr.parseString(expression).as_list()
+        self.parse(list_nested[0])
+
+    def print_graph(self):
+        labels = nx.get_node_attributes(self.dag.g, 'fn') 
+        nx.draw(self.dag.g, labels=labels, font_weight='bold')
+        plt.show() 
+
+# Test dell'esempio
+expression = "f(f(a,b),b)=f(a,b),g(a)"
+dag = DAG()
+parser = Parser(dag)
+graph = parser.parse_equations(expression)
+parser.print_graph()
