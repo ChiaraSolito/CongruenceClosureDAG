@@ -1,12 +1,10 @@
 import re
-from DAG import DAG
+from src.dag import DAG
 from pyparsing import nestedExpr
 
-class Parser:
+class DagBuilder:
 
     def __init__(self, dag: DAG):
-        self.atom_dict = {}
-        #self.original_data = data
         self.dag = dag
         self.diseq = []
         self.eq = []
@@ -59,11 +57,3 @@ class Parser:
         print(expression)
         list_nested = expr.parseString(expression).as_list()
         self.parse(list_nested[0])
-
-# Test dell'esempio
-expression = "f(f(a,b),b)"
-dag = DAG()
-parser = Parser(dag)
-graph = parser.parse_equations(expression)
-dag.simplify()
-dag.print_graph()

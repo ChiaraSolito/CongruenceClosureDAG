@@ -2,6 +2,7 @@ import networkx as nx
 from uuid import uuid4
 import matplotlib.pyplot as plt
 from networkx.drawing.nx_pydot import graphviz_layout
+from dag_builder import DagBuilder
 
 class DAG: 
 
@@ -90,6 +91,13 @@ class DAG:
         pos = graphviz_layout(self.g, prog="dot")
         nx.draw(self.g, pos, labels=labels, font_weight='bold')
         plt.show() 
+
+    def build(self,equation):
+        builder = DagBuilder(self.g)
+        builder.parse_equations(equation)
+        return self.g
+        
+
 
 
 

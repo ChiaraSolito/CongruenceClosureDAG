@@ -1,13 +1,13 @@
-from src import DAG
-from src import Parser
-from src import SmtParser
+from src import dag
+from src import dag_builder
+from src import smt_parser
 import sys
 import time
+from pathlib import Path
 
 def process(file:str):
-    with open(file) as f:
-        data = [line for line in f.readlines()]
-    return data
+    path = Path(file)
+    return path.read_text()
 
 def main(name:str):
 
@@ -21,14 +21,14 @@ def main(name:str):
         exit()
 
     #instantiate classes
-    solver = DAG()
+    
     if file.endswith('.smt2'):
-        parser = SmtParser()
-        parsed_input = parser.parse(file)
+        parser = smt_parser()
+        solver = parser.parse(file)
     else:
-        parser = Parser()
+        parser = dag_builder()
         input = process(file)
-        parsed_input = parser.parse_equations(input)
+        solver = parser.parse_equations(input)
 
 
 if __name__ == "__main__":
