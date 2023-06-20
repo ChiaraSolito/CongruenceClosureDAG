@@ -9,6 +9,12 @@ class DagBuilder:
         self.diseq = []
         self.eq = []
 
+    def parse_formula(self, data):
+        for line in data:
+            self.parse_equations(line)
+        self.dag.simplify()
+        return self.eq, self.diseq
+
     def parse_equations(self, data):
 
         if "!=" in data:
@@ -35,14 +41,14 @@ class DagBuilder:
         nodes = []
 
         for element in list_elements:
-            print(f"element: {element}")
+            #print(f"element: {element}")
             if isinstance(element,str):
 
                 nodes.append(self.dag.add_node(element,[]))
 
             else:
                 parent = nodes[-1]
-                print(f"parent: {parent}")
+                #print(f"parent: {parent}")
 
                 nodes2 = self.parse(element)
 
@@ -54,6 +60,6 @@ class DagBuilder:
     def parse_expression(self,expression:str):
         expr = nestedExpr()  
         expression = expression.replace("," , " ")
-        print(expression)
+        #print(expression)
         list_nested = expr.parseString(expression).as_list()
         self.parse(list_nested[0])
