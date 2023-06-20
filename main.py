@@ -30,17 +30,19 @@ def main(name:str):
         dag = DAG()
         parser = Parser(dag)
         input = process(file)
-        parser.parse_formula(input)
+        eq, diseq = parser.parse_formula(input)
 
         # merge of all node that are in equivalence relation
-        satisfable = True
-        for coppiaeq in dag.equalities:
-            if satisfable:
-                satisfable = dag.merge(dag.g.nodes[coppiaeq[0]], dag.g.nodes[coppiaeq[1]]) 
-                #non funziona così perché i miei nodi non sono identificati da questo
-                pass
+        satisfiable = True
 
-        if satisfable:
+        for couple in eq:
+            dag.merge(couple[0], couple[1]) 
+        
+        for couple in diseq:
+            if dag.find(couple[0]) == dag.find(couple[1]):
+                satisfiable = False
+
+        if satisfiable:
             print('The formula is satisfiable! You can look at the graph generated.')
             #end clock
             end = time.perf_counter()
@@ -51,6 +53,7 @@ def main(name:str):
             #end clock
             end = time.perf_counter()
             print("Runned in :", end-start)
+            dag.print_graph()
 
 
 
