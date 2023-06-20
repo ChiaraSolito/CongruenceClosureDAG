@@ -22,40 +22,40 @@ def main(name:str):
         exit()
 
     #instantiate classes
-    
+    dag = DAG()
+    parser = Parser(dag)
+
     if file.endswith('.smt2'):
-        parser = SmtParser()
-        solver = parser.parse(file)
-        print(solver)
+        smt = SmtParser()
+        input = smt.parse(file)
+        print(input)
     else:
-        dag = DAG()
-        parser = Parser(dag)
         input = process(file)
-        eq, diseq = parser.parse_formula(input)
+    
+    eq, diseq = parser.parse_formula(input)
 
+    # merge of all node that are in equivalence relation
+    satisfiable = True
 
-        # merge of all node that are in equivalence relation
-        satisfiable = True
+    for couple in eq:
+        dag.merge(couple[0], couple[1]) 
+    
+    for couple in diseq:
+        if dag.find(couple[0]) == dag.find(couple[1]):
+            satisfiable = False
 
-        for couple in eq:
-            dag.merge(couple[0], couple[1]) 
-        
-        for couple in diseq:
-            if dag.find(couple[0]) == dag.find(couple[1]):
-                satisfiable = False
-
-        if satisfiable:
-            print('The formula is satisfiable! You can look at the graph generated.')
-            #end clock
-            end = time.perf_counter()
-            print("Runned in :", end-start)
-            dag.print_graph()
-        else:
-            print('The formula is unsatisfiable! We will now terminate the execution.')
-            #end clock
-            end = time.perf_counter()
-            print("Runned in :", end-start)
-            dag.print_graph()
+    if satisfiable:
+        print('The formula is satisfiable! You can look at the graph generated.')
+        #end clock
+        end = time.perf_counter()
+        print("Runned in :", end-start)
+        dag.print_graph()
+    else:
+        print('The formula is unsatisfiable! We will now terminate the execution.')
+        #end clock
+        end = time.perf_counter()
+        print("Runned in :", end-start)
+        dag.print_graph()
 
 
 

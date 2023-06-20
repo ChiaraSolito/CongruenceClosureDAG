@@ -1,6 +1,5 @@
 from pysmt.smtlib.parser import SmtLibParser
-from pysmt.rewritings import CNFizer 
-cnf_parser = CNFizer()
+import re
 
 class SmtParser():
     def __init__(self):
@@ -19,25 +18,20 @@ class SmtParser():
         assert script.contains_command("check-sat")
 
         formulas = f.serialize()
+        formulas = formulas[1:] 
+        formulas = formulas[:-1]
         print(formulas)
 
-        atoms = list(map(lambda x: x.strip(),separated_formulas))
+        if '(! (' in formulas:
+            formulas = formulas.replace('(! ','')
+            formulas = formulas[:-1] 
 
-        real_atoms,real_formulas = [],[]
-        for atom in atoms:
-            if atom.find("=") != -1:
-                equality = atom[1:-1].split("=")
-                real_atoms.append(equality[0].strip())
-                real_atoms.append(equality[1].strip())
-            else:
-                real_atoms.append(atom)
+        #formulas.remove
+        if '&' in formulas:
+            couple = re.split('&', formulas)
+            couple[0] = couple[0][1:]
+            couple[0] = couple[0][:-2]
+            couple[1] = couple[1][2:]
+            couple[1] = couple[1][:-1]
 
-        # Separate all Ands 
-        if formulas.find("&") != -1:
-            separated_formulas = formulas[1:-1].split("&")
-            real_formulas.extend(list(map(lambda x: x.strip(),separated_formulas)))
-
-        # Remove all non-equality formulas
-        real_formulas = [x for x in real_formulas if x.find("=")!=-1 ]
-
-        return real_formulas,set(real_atoms),ground_truth.upper()
+        return couple
