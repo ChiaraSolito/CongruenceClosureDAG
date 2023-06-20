@@ -2,7 +2,7 @@ import re
 from src.dag import DAG
 from pyparsing import nestedExpr
 
-class DagBuilder:
+class Parser:
 
     def __init__(self, dag: DAG):
         self.dag = dag
