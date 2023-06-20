@@ -130,13 +130,8 @@ class DAG:
                         predecessors.update(graph_copy.predecessors(v))
 
                         for predecessor in predecessors:
-                            self.remove_edge(predecessor,u)
-                            self.remove_edge(predecessor,v)
                             self.add_edge(predecessor, newid)
-
                         for successor in graph_copy.successors(u):
-                            self.remove_edge(u,successor)
-                            self.remove_edge(v,successor)
                             self.add_edge(newid,successor)
                         
                         #remove the node and substitute his id in the list of equalities
@@ -149,6 +144,11 @@ class DAG:
                             diseq = [[newid,item[1]] if item[0] == u else [item[0],item[1]] for item in diseq]
                             diseq = [[item[0],newid] if item[1] == u else [item[0],item[1]] for item in diseq]
 
+                            #remove predecessor and successors
+                            for predecessor in graph_copy.predecessors(u):
+                                self.remove_edge(predecessor,u)
+                            for successor in graph_copy.successors(u):
+                                self.remove_edge(u,successor)
                             self.g.remove_node(u)
 
                         #remove the node and substitute his id in the list of equalities
@@ -160,6 +160,11 @@ class DAG:
                             diseq = [[newid,item[1]] if item[0] == v else [item[0],item[1]] for item in diseq]
                             diseq = [[item[0],newid] if item[1] == v else [item[0],item[1]] for item in diseq]
 
+                            #remove edges before removing nodes
+                            for predecessor in graph_copy.predecessors(v):
+                                self.remove_edge(predecessor,v)
+                            for successor in graph_copy.successors(v):
+                                self.remove_edge(v,successor)
                             self.g.remove_node(v)
 
         return eq, diseq

@@ -26,6 +26,7 @@ def main(name:str):
     if file.endswith('.smt2'):
         parser = SmtParser()
         solver = parser.parse(file)
+        print(solver)
     else:
         dag = DAG()
         parser = Parser(dag)

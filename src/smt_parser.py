@@ -19,6 +19,7 @@ class SmtParser():
         assert script.contains_command("check-sat")
 
         formulas = f.serialize()
+        print(formulas)
 
         atoms = list(map(lambda x: x.strip(),separated_formulas))
 
