@@ -3,6 +3,7 @@ from uuid import uuid4, UUID
 import matplotlib.pyplot as plt
 from networkx.drawing.nx_pydot import graphviz_layout
 from itertools import combinations
+import copy 
 
 class DAG: 
 
@@ -13,23 +14,30 @@ class DAG:
 
     def add_node(self, fn, args:list):
         id = uuid4()
-        self.g.add_node(id,fn=fn, args=args, m_find=id,m_ccpar=set())
+        self.g.add_node(id, fn=fn, args=args, m_find=id, m_ccpar=set())
         return id 
         
     def add_edge(self, node1:UUID, node2:UUID):
         self.node(node2)["m_ccpar"].add(node1)
         self.node(node1)["args"].append(node2)
         return self.g.add_edge(node1, node2)
+
+    def remove_edge(self, node1:UUID, node2:UUID):
+        if node1 in self.node(node2)["m_ccpar"]:
+            self.node(node2)["m_ccpar"].remove(node1)
+        if node2 in self.node(node1)["args"]:
+            self.node(node1)["args"].remove(node2)
     
     def node(self, i:UUID):
         return self.g.nodes[i]
     
     def find(self, i:UUID):
         n = self.node(i)
+
         if n["m_find"] == i: 
             return i
         else:
-            self.find(n["m_find"]) 
+            return self.find(n["m_find"]) 
     
     def union(self, i1:UUID, i2:UUID):
         n1 = self.node(i1)
@@ -64,15 +72,13 @@ class DAG:
         f2 = self.find(i2)
 
         if f1 != f2:
-            Pi1 = self.ccpar(i1)
-            Pi2 = self.ccpar(i2)
-            self.union(i1,i2)
+            Pi1 = copy.copy(self.ccpar(i1))
+            Pi2 = copy.copy(self.ccpar(i2))
 
+            self.union(i1,i2)
+            
             for t1 in Pi1:
                 for t2 in Pi2:
-
-                    print(t1)
-                    print(t2)
 
                     if self.find(t1) != self.find(t2) or self.congruent(t1,t2):
                         self.merge(t1,t2)
@@ -97,6 +103,8 @@ class DAG:
                     diseq = [[newid,item[1]] if item[0] == node else [item[0],item[1]] for item in diseq]
                     diseq = [[item[0],newid] if item[1] == node else [item[0],item[1]] for item in diseq]
 
+                    for predecessor in predecessors:
+                        self.remove_edge(predecessor,node)
                     self.g.remove_node(node)
 
                 for predecessor in predecessors:
@@ -122,8 +130,13 @@ class DAG:
                         predecessors.update(graph_copy.predecessors(v))
 
                         for predecessor in predecessors:
+                            self.remove_edge(predecessor,u)
+                            self.remove_edge(predecessor,v)
                             self.add_edge(predecessor, newid)
+
                         for successor in graph_copy.successors(u):
+                            self.remove_edge(u,successor)
+                            self.remove_edge(v,successor)
                             self.add_edge(newid,successor)
                         
                         #remove the node and substitute his id in the list of equalities

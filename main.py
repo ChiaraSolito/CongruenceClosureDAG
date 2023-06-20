@@ -32,6 +32,7 @@ def main(name:str):
         input = process(file)
         eq, diseq = parser.parse_formula(input)
 
+
         # merge of all node that are in equivalence relation
         satisfiable = True
 
