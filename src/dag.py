@@ -13,12 +13,11 @@ class DAG:
 
     def add_node(self, fn, args:list):
         id = uuid4()
-        m_ccpar = set()
-        m_find = [id]
-        self.g.add_node(id,fn=fn, args=args, m_find=m_find,m_ccpar=m_ccpar)
+        self.g.add_node(id,fn=fn, args=args, m_find=id,m_ccpar=set())
         return id 
         
-    def add_edge(self,node1,node2):
+    def add_edge(self, node1:UUID, node2:UUID):
+        self.node(node2)["m_ccpar"].add(node1)
         self.node(node1)["args"].append(node2)
         return self.g.add_edge(node1, node2)
     
@@ -33,21 +32,23 @@ class DAG:
             self.find(n["m_find"]) 
     
     def union(self, i1:UUID, i2:UUID):
-        n1 = self.node(self.find(i1))
-        n2 = self.node(self.find(i2))
+        n1 = self.node(i1)
+        n2 = self.node(i2)
 
         n1["m_find"] = n2["m_find"]
         n2["m_ccpar"].update(n1["m_ccpar"])
         n1["m_ccpar"].clear()
+
+        return n1["m_ccpar"],n2["m_ccpar"]
     
     def ccpar(self, i:UUID):
-        return self.node(self.find(i))["m_ccpar"]
+        return self.node(i)["m_ccpar"]
     
     def congruent(self, i1:UUID, i2:UUID):
         ris = True
         n1 = self.node(i1)
         n2 = self.node(i2)
-        if n1["fn"]== n2["fn"] and len(n1["args"]) == len(n2["args"]):
+        if n1["fn"] == n2["fn"] and len(n1["args"]) == len(n2["args"]):
             for a1 in n1["args"]:
                 if ris:
                     ris = False
@@ -59,17 +60,25 @@ class DAG:
         return ris
     
     def merge(self, i1:UUID, i2:UUID):
-        if self.find(i1) != self.find(i2):
+        f1 = self.find(i1)
+        f2 = self.find(i2)
+
+        if f1 != f2:
             Pi1 = self.ccpar(i1)
             Pi2 = self.ccpar(i2)
             self.union(i1,i2)
 
             for t1 in Pi1:
                 for t2 in Pi2:
+
+                    print(t1)
+                    print(t2)
+
                     if self.find(t1) != self.find(t2) or self.congruent(t1,t2):
                         self.merge(t1,t2)
     
     def simplify(self,eq,diseq):
+
         fns = [self.g.nodes[node]['fn'] for node in self.g.nodes]
 
         #first simplify leaves
@@ -82,10 +91,16 @@ class DAG:
                 predecessors = set()
                 for node in leaves:
                     predecessors.update(self.g.predecessors(node))
+
+                    eq = [[newid,item[1]] if item[0] == node else [item[0],item[1]] for item in eq]
+                    eq = [[item[0],newid] if item[1] == node else [item[0],item[1]] for item in eq]
+                    diseq = [[newid,item[1]] if item[0] == node else [item[0],item[1]] for item in diseq]
+                    diseq = [[item[0],newid] if item[1] == node else [item[0],item[1]] for item in diseq]
+
                     self.g.remove_node(node)
 
                 for predecessor in predecessors:
-                    self.g.add_edge(predecessor, newid)
+                    self.add_edge(predecessor, newid)
 
         #then simplify functions
         for fn in fns:
@@ -100,40 +115,37 @@ class DAG:
                     if list(graph_copy.successors(u)) == list(graph_copy.successors(v)):
 
                         newid = self.add_node(fn,[])
+
                         predecessors = set()
 
                         predecessors.update(graph_copy.predecessors(u))
                         predecessors.update(graph_copy.predecessors(v))
 
                         for predecessor in predecessors:
-                            self.g.add_edge(predecessor, newid)
+                            self.add_edge(predecessor, newid)
                         for successor in graph_copy.successors(u):
-                            self.g.add_edge(newid,successor)
+                            self.add_edge(newid,successor)
                         
                         #remove the node and substitute his id in the list of equalities
-                        if self.g.has_node(u):
-                            for i in range(0,len(eq)):
-                                print(eq[i])
-                                if eq[i] == u:
-                                    eq[i] = newid
 
-                            #and disequalities
-                            for i in range(0,len(diseq)):
-                                if diseq[i] == u:
-                                    diseq[i] = newid
+                        if self.g.has_node(u):
                             
+                            eq = [[newid,item[1]] if item[0] == u else [item[0],item[1]] for item in eq]
+                            eq = [[item[0],newid] if item[1] == u else [item[0],item[1]] for item in eq]
+
+                            diseq = [[newid,item[1]] if item[0] == u else [item[0],item[1]] for item in diseq]
+                            diseq = [[item[0],newid] if item[1] == u else [item[0],item[1]] for item in diseq]
+
                             self.g.remove_node(u)
 
                         #remove the node and substitute his id in the list of equalities
                         if self.g.has_node(v):
-                            for i in range(0,len(eq)):
-                                if eq[i] == v:
-                                    eq[i] = newid
 
-                            #and disequalities
-                            for i in range(0,len(diseq)):
-                                if diseq[i] == v:
-                                    diseq[i] = newid
+                            eq = [[newid,item[1]] if item[0] == v else [item[0],item[1]] for item in eq]
+                            eq = [[item[0],newid] if item[1] == v else [item[0],item[1]] for item in eq]
+
+                            diseq = [[newid,item[1]] if item[0] == v else [item[0],item[1]] for item in diseq]
+                            diseq = [[item[0],newid] if item[1] == v else [item[0],item[1]] for item in diseq]
 
                             self.g.remove_node(v)
 
