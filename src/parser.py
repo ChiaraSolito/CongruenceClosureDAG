@@ -14,12 +14,7 @@ class Parser:
         for line in data:
             self.parse_equations(line)
 
-        #simplify the graph and change the id list of equalities and inequalities
-        eq, diseq = self.dag.simplify(self.eq, self.diseq)
-        self.dag.equalities = eq
-        self.dag.inequalities = diseq
-        
-        print(eq,diseq)
+        return self.dag.simplify(self.eq, self.diseq)
 
     def parse_equations(self, data):
 
@@ -30,7 +25,7 @@ class Parser:
             root1 = self.parse_expression("(" + couple[0] + ")")[0]
             root2 = self.parse_expression("(" + couple[1] + ")")[0]
 
-            self.diseq.append((root1,root2))
+            self.diseq.append([root1,root2])
 
         elif "=" in data:
             couple = re.split('=', data)
@@ -38,7 +33,7 @@ class Parser:
             root1 = self.parse_expression("(" + couple[0] + ")")[0]
             root2 = self.parse_expression("(" + couple[1] + ")")[0]
 
-            self.eq.append((root1,root2))
+            self.eq.append([root1,root2])
 
         else:
             self.parse_expression("(" + data + ")")
