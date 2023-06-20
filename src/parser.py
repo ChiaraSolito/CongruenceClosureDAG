@@ -10,10 +10,16 @@ class Parser:
         self.eq = []
 
     def parse_formula(self, data):
+        #parse each line of the formula as if in AND
         for line in data:
             self.parse_equations(line)
-        self.dag.simplify()
-        return self.eq, self.diseq
+
+        #simplify the graph and change the id list of equalities and inequalities
+        eq, diseq = self.dag.simplify(self.eq, self.diseq)
+        self.dag.equalities = eq
+        self.dag.inequalities = diseq
+        
+        print(eq,diseq)
 
     def parse_equations(self, data):
 
@@ -21,18 +27,18 @@ class Parser:
 
             couple = re.split('!=', data)
 
-            self.parse_expression("(" + couple[0] + ")")
-            self.parse_expression("(" + couple[1] + ")")
+            root1 = self.parse_expression("(" + couple[0] + ")")[0]
+            root2 = self.parse_expression("(" + couple[1] + ")")[0]
 
-            self.diseq.append(couple)
+            self.diseq.append((root1,root2))
 
         elif "=" in data:
             couple = re.split('=', data)
 
-            self.parse_expression("(" + couple[0] + ")")
-            self.parse_expression("(" + couple[1] + ")")
+            root1 = self.parse_expression("(" + couple[0] + ")")[0]
+            root2 = self.parse_expression("(" + couple[1] + ")")[0]
 
-            self.eq.append(couple)
+            self.eq.append((root1,root2))
 
         else:
             self.parse_expression("(" + data + ")")
@@ -62,4 +68,4 @@ class Parser:
         expression = expression.replace("," , " ")
         #print(expression)
         list_nested = expr.parseString(expression).as_list()
-        self.parse(list_nested[0])
+        return self.parse(list_nested[0])

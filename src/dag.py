@@ -68,9 +68,8 @@ class DAG:
                 for t2 in Pi2:
                     if self.find(t1) != self.find(t2) or self.congruent(t1,t2):
                         self.merge(t1,t2)
-        return 
     
-    def simplify(self):
+    def simplify(self,eq,diseq):
         fns = [self.g.nodes[node]['fn'] for node in self.g.nodes]
 
         #first simplify leaves
@@ -95,8 +94,9 @@ class DAG:
             if len(non_leaves)>1:
                 graph_copy = self.g.copy()
 
+                #for each couple of nodes with the same fn
                 for (u,v) in combinations(non_leaves,2):
-
+                    #if they have the same list of successors we unify them
                     if list(graph_copy.successors(u)) == list(graph_copy.successors(v)):
 
                         newid = self.add_node(fn,[])
@@ -110,11 +110,34 @@ class DAG:
                         for successor in graph_copy.successors(u):
                             self.g.add_edge(newid,successor)
                         
+                        #remove the node and substitute his id in the list of equalities
                         if self.g.has_node(u):
+                            for i in range(0,len(eq)):
+                                print(eq[i])
+                                if eq[i] == u:
+                                    eq[i] = newid
+
+                            #and disequalities
+                            for i in range(0,len(diseq)):
+                                if diseq[i] == u:
+                                    diseq[i] = newid
+                            
                             self.g.remove_node(u)
+
+                        #remove the node and substitute his id in the list of equalities
                         if self.g.has_node(v):
+                            for i in range(0,len(eq)):
+                                if eq[i] == v:
+                                    eq[i] = newid
+
+                            #and disequalities
+                            for i in range(0,len(diseq)):
+                                if diseq[i] == v:
+                                    diseq[i] = newid
+
                             self.g.remove_node(v)
 
+        return eq, diseq
 
     def print_graph(self):
         labels = nx.get_node_attributes(self.g, 'fn') 
