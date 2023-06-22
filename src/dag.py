@@ -46,8 +46,13 @@ class DAG:
         #il ccpar maggiore quello che prevale
 
         n1["m_find"] = n2["m_find"]
-        n2["m_ccpar"] = n2["m_ccpar"].union(n1["m_ccpar"])
-        n1["m_ccpar"] = set()
+
+        if len(n1["m_ccpar"]) > len(n2["m_ccpar"]):
+            n1["m_ccpar"] = n1["m_ccpar"].union(n2["m_ccpar"])
+            n2["m_ccpar"] = set()
+        else:
+            n2["m_ccpar"] = n2["m_ccpar"].union(n1["m_ccpar"])
+            n1["m_ccpar"] = set()
 
         return n1["m_ccpar"],n2["m_ccpar"]
     
@@ -55,18 +60,20 @@ class DAG:
         return self.node(self.find(i))["m_ccpar"]
     
     def congruent(self, i1:UUID, i2:UUID):
-        ris = False
+            
         n1 = self.node(i1)
         n2 = self.node(i2)
-
-        if n1["fn"] == n2["fn"] and len(n1["args"]) == len(n2["args"]):
-            for a in range(0,len(n1["args"])):
-                if self.find(n1["args"][a]) == self.find(n2["args"][a]):
-                    ris = True
-                else:
-                    ris = False
-                    break
-        return ris
+        if not (n1["fn"] == n2["fn"]): 
+            return False
+        elif not((len(n1["args"]) == len(n2["args"]))): 
+            return False
+        
+        for i in range(len(n1["args"])):
+            val1 = self.find(n1["args"][i]) 
+            val2 = self.find(n2["args"][i]) 
+            if val1 != val2: 
+                return False
+        return True
     
     def merge(self, i1:UUID, i2:UUID):
         f1 = self.find(i1)
