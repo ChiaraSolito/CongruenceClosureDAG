@@ -41,9 +41,9 @@ This project aims to implement the congruence closure algorithm with DAG to sati
 The program is delivered via a GitHub repository. The whole structure of the repository was also sent in the form of a compressed archive to the instructor. To execute it, you have to:
 \begin{enumerate}
     \item Clone the repository, or extract the files from the zip folder.
-    \item Copy, or drag and drop, in the folder \texttt{data} the test file you want to input to the program. Please be careful with the extension of the file and the format. \\ More information on how to format the accepted input can be found in \textit{\textbf{subsection 4.1}} or in the \texttt{README} of the repository.
+    \item Copy, or drag and drop, in the folder \texttt{data} the test file you want to input to the program. Please be careful with the extension of the file and the format. \\ More information on how to format the accepted input can be found in \textit{\textbf{Section 4}} or in the \texttt{README} of the repository.
     \item If it's the first time you run the algorithm, you have to run the bash script \texttt{run.sh}: the bash script will create and activate a venv environment, and automatically install each dependency of the project. It will also start the program and ask for the input file name (with its extension, e.g. \texttt{input.txt}).\\
-    After the first time, you can simply call the main script:
+    After the first time, you can simply call the main script, after activating the environment:
     \begin{verbatim}
         source ./venv/bin/activate
         python3 main.py
@@ -74,7 +74,7 @@ The project was implemented using \texttt{python3} in version 3.11. The structur
     It also has all the functions that are needed for the computation of the algorithm:
         \begin{itemize}
             \item \texttt{add$\_$node}: it's a function that adds a node, with a unique id (a UUID4), an fn (so a symbol), the node arguments, the node "finds" and the node congruence parents. When a node is instantiated, of course, the find will point to itself, while the 'cc$\_$par' attribute will be empty.
-            \item \texttt{add$\_$edge}: when an edge is added between two nodes while constructing the graph, the parent node will be added to the list of parents of such node, while the child node will be added to the list of arguments of the parent. In an opposite fashion \texttt{remove$\_$edge} (that gets used when compacting the graph structure) removes both the node from each other lists.
+            \item \texttt{add$\_$edge}: when an edge is added between two nodes while constructing the graph, the parent node will be added to the list of parents of such node, while the child node will be added to the list of arguments of the parent. In an opposite fashion \texttt{remove$\_$edge} (that gets used when compacting the graph structure) removes both nodes from each other lists.
             \item \texttt{node()}, \texttt{find()}, \texttt{ccpar()}, \texttt{congruent()}, \texttt{merge()} are the exact implementation of the pseudocode introduced both in class and Sect. 9.3 of the Bradley-Manna textbook~\cite{manna}, with the exception of the \texttt{union()} function, where we implement the non-arbitrary choice of the representative of the new class, picking the one with the largest ccpar set.
             
             \item \texttt{simplify}: as we will elaborate while talking about the Parser, the graph, as it is created in the beginning, repeats each node all the times it encounters it. With the simplify function each leaf with the same symbol gets unified, and so is each equivalent function (e.g. f(a,b) and f(a,b) gets unified.) 
@@ -101,7 +101,7 @@ For each couple in the equation list we call the merge function, then for each i
 
 \begin{figure}[!htpb]
     \centering
-    \includegraphics[scale=0.55]{Figure_2.png}
+    \includegraphics[scale=0.45]{Figure_2.png}
     \caption{figure}{DAG representation with find.}
     \label{fig:enter-label}
 \end{figure}
@@ -111,8 +111,8 @@ For each couple in the equation list we call the merge function, then for each i
 
 \subsection{Text files}
 
-Files with \texttt{.txt}' extension are accepted if they are presented in AND with each other.
-Each equality and disequality to be in consideration in the algorithm must be put on different lines.
+Files with '\texttt{.txt}' extension are accepted if the formulas are presented in AND with each other.
+Each equality and disequality to be in consideration in the algorithm must be put on different lines, and with the outermost symbols without brackets.
 
 Example of the structure of an 'input.txt' file:
 
@@ -130,7 +130,7 @@ As for the text files, the formula is read as different equalities and disequali
 
 \section{Test and Results}
 
-The script was tested on 14 input files. Nine are in the txt form and 5 in the smt2 form, you can find all files in the folder \texttt{data}. All tests are correct: a summary of tests is visible in Table 1. 
+The script was tested on 14 input files, coming mainly from \cite{manna}. Nine are in the txt form and 5 in the smt2 form, you can find all files in the folder \texttt{data}. All tests are correct: a summary of tests is visible in Table 1. 
     \begin{table}
     \centering
         \begin{tabular}{|>{\hspace{0pt}}m{0.196\linewidth}|>{\hspace{0pt}}m{0.181\linewidth}|>{\hspace{0pt}}m{0.365\linewidth}|>{\hspace{0pt}}m{0.179\linewidth}|} 
@@ -170,15 +170,18 @@ The script was tested on 14 input files. Nine are in the txt form and 5 in the s
     \end{table}
 
 \section{Critic Analysis}
+\paragraph{Variants and Heuristics}
+As mentioned above, the algorithm was implemented using one of the variants. Non-arbitrary choice of the representative of the new class in the UNION function: pick the one with the largest ccpar set.
+
 \paragraph{Smt Files}
 The principal problem that can be encountered is when using \texttt{.smt2} files. To put the input in a formula compatible with the one accepted by the parser written, we play with the string: sometimes this creates problems with brackets and makes the process of the input impossible.
 
 \paragraph{DNF and CNF formulas}
 The main limitation, of course, is encountered with formulas that aren't in AND, since we don't accept OR, quantifier, etc. in the formulas.
 
-\begin{thebibliography}{widest entry}
+\begin{thebibliography}{}
  \bibitem{manna} 
-    Aaron R. Bradley, Zohar Manna, \emph{The Calculus of Computation, Decision Procedures with Applications to Verification}, 2007 - Springer Science and Business Media.
+Aaron R. Bradley, Zohar Manna, \emph{The Calculus of Computation, Decision Procedures with Applications to Verification}, 2007 - Springer Science and Business Media.
  \end{thebibliography}
 
 \end{document}
