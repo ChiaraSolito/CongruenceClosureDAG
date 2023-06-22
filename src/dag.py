@@ -185,7 +185,33 @@ class DAG:
         pos = graphviz_layout(self.g, prog="dot")
         nx.draw(self.g, pos, labels=labels, font_weight='bold')
         plt.show() 
-        
+
+    def print_final_graph(self):
+        final_graph = self.g.copy()
+
+        edges_find = []
+        edges_ccpar = []
+        for u in final_graph.nodes():
+            node = final_graph.nodes[u]
+
+            #add find edges
+            if str(node["m_find"]) != str(u):
+                edges_find.append((u,node["m_find"]))
+            #add ccpar edges
+
+            if len(node["m_ccpar"])>0:
+                for v in node["m_ccpar"]:
+                    #only if it's not its direct parent
+                    if u not in final_graph.nodes[v]["args"]:
+                        edges_ccpar.append((v,u))
+
+        labels = nx.get_node_attributes(final_graph, 'fn') 
+        pos = graphviz_layout(final_graph, prog="dot")
+
+        nx.draw_networkx_edges(final_graph, pos=pos,edgelist=edges_find, style = 'dashed',connectionstyle='arc3 ,rad=0.3')
+        nx.draw_networkx_edges(final_graph, pos=pos,edgelist=edges_ccpar, style = 'dashdot',connectionstyle='arc3 ,rad=0.3')
+        nx.draw(final_graph, pos, labels=labels, font_weight='bold')
+        plt.show() 
 
 
 

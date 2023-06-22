@@ -8,8 +8,6 @@ def process(file:str):
         return [line.rstrip('\n') for line in f.readlines()]
 
 def main(name:str):
-    #start clock
-    start = time.perf_counter()
 
     if len(name)<1: 
         print("ERROR: no file in input.")
@@ -28,13 +26,19 @@ def main(name:str):
         smt = SmtParser()
         input = smt.parse(file)
         form = ' & '.join(input)
-        print(f'Final form of the input is: {form}')
+        print(f'Final form of the input is: {form}.\n You can look at the generated graph. Close the image to continue.')
+        print()
     else:
         input = process(file)
         form = ' & '.join(input)
-        print(f'Final form of the input is: {form}')
-    
+        print(f'Final form of the input is: {form}.\n You can look at the generated graph. Close the image to continue.')
+        print()
+
     dag.g, eq, diseq = parser.parse_formula(input)
+    dag.print_graph()
+
+    #start clock
+    start = time.perf_counter()
 
     # merge of all node that are in equivalence relation
     satisfiable = True
@@ -47,17 +51,21 @@ def main(name:str):
             satisfiable = False
 
     if satisfiable:
-        print('The formula is satisfiable! You can look at the graph generated.')
+        print('The formula is satisfiable!')
         #end clock
         end = time.perf_counter()
-        print("Runned in :", end-start)
-        dag.print_graph()
+        print("Time to compute satisfiability: ", end-start)
+        print()
+        print("Final graph generated from the algorithm. Close the image to end the script execution.")
+        dag.print_final_graph()
     else:
-        print('The formula is unsatisfiable! We will now terminate the execution.')
+        print('The formula is unsatisfiable!')
+        print()
         #end clock
         end = time.perf_counter()
-        print("Runned in :", end-start)
-        dag.print_graph()
+        print("Time to compute unsatisfiability: ", end-start)
+        print("Final graph generated from the algorithm. Close the image to end the script execution.")
+        dag.print_final_graph()
 
 
 
