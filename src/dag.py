@@ -40,31 +40,30 @@ class DAG:
             return self.find(n["m_find"]) 
     
     def union(self, i1:UUID, i2:UUID):
-        n1 = self.node(i1)
-        n2 = self.node(i2)
+        n1 = self.node(self.find(i1))
+        n2 = self.node(self.find(i2))
+
+        #il ccpar maggiore quello che prevale
 
         n1["m_find"] = n2["m_find"]
-        n2["m_ccpar"].update(n1["m_ccpar"])
-        n1["m_ccpar"].clear()
+        n2["m_ccpar"] = n2["m_ccpar"].union(n1["m_ccpar"])
+        n1["m_ccpar"] = set()
 
         return n1["m_ccpar"],n2["m_ccpar"]
     
     def ccpar(self, i:UUID):
-        return self.node(i)["m_ccpar"]
+        return self.node(self.find(i))["m_ccpar"]
     
     def congruent(self, i1:UUID, i2:UUID):
-        ris = True
+        ris = False
         n1 = self.node(i1)
         n2 = self.node(i2)
         if n1["fn"] == n2["fn"] and len(n1["args"]) == len(n2["args"]):
-            for a1 in n1["args"]:
-                if ris:
+            for a in range(0,len(n1["args"])):
+                if self.find(n1["args"][a]) == self.find(n2["args"][a]):
+                    ris = True
+                else:
                     ris = False
-                    for a2 in n2["args"]:
-                        if self.find(a1) == self.find(a2):
-                            ris = True
-        else:
-            return False
         return ris
     
     def merge(self, i1:UUID, i2:UUID):
@@ -80,7 +79,7 @@ class DAG:
             for t1 in Pi1:
                 for t2 in Pi2:
 
-                    if self.find(t1) != self.find(t2) or self.congruent(t1,t2):
+                    if self.find(t1) != self.find(t2) and self.congruent(t1,t2):
                         self.merge(t1,t2)
     
     def simplify(self,eq,diseq):
@@ -190,7 +189,7 @@ class DAG:
         final_graph = self.g.copy()
 
         edges_find = []
-        edges_ccpar = []
+        #edges_ccpar = []
         for u in final_graph.nodes():
             node = final_graph.nodes[u]
 
@@ -199,17 +198,17 @@ class DAG:
                 edges_find.append((u,node["m_find"]))
             #add ccpar edges
 
-            if len(node["m_ccpar"])>0:
-                for v in node["m_ccpar"]:
-                    #only if it's not its direct parent
-                    if u not in final_graph.nodes[v]["args"]:
-                        edges_ccpar.append((v,u))
+            # if len(node["m_ccpar"])>0:
+            #     for v in node["m_ccpar"]:
+            #         #only if it's not its direct parent
+            #         if u not in final_graph.nodes[v]["args"]:
+            #             edges_ccpar.append((v,u))
 
         labels = nx.get_node_attributes(final_graph, 'fn') 
         pos = graphviz_layout(final_graph, prog="dot")
 
         nx.draw_networkx_edges(final_graph, pos=pos,edgelist=edges_find, style = 'dashed',connectionstyle='arc3 ,rad=0.3')
-        nx.draw_networkx_edges(final_graph, pos=pos,edgelist=edges_ccpar, style = 'dashdot',connectionstyle='arc3 ,rad=0.3')
+        #nx.draw_networkx_edges(final_graph, pos=pos,edgelist=edges_ccpar, style = 'dashdot',connectionstyle='arc3 ,rad=0.3')
         nx.draw(final_graph, pos, labels=labels, font_weight='bold')
         plt.show() 
 
