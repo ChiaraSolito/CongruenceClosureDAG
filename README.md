@@ -21,7 +21,7 @@ python3 main.py
 
 ### Text files
 
-Files with '.txt' extension are accepted if they are presented in a DNF form.\
+Files with '.txt' extension are accepted if they are presented in AND with each other.\
 Each equality and disequality to be in consider in the algorithm must be put on different lines.
 
 Example of structure of a 'input.txt' file:
@@ -35,7 +35,7 @@ This will be interpreted as 'f(a,b) = a & f(a,b) != a'
 
 ### SMT files
 
-Smt2 format is accepted only in DNF form.\
+Smt2 format is accepted only in AND with eachother.\
 As for the text files, the formula is read as different equalities and disequalities in AND.
 
 Example of structure of a 'input.smt2' file:
