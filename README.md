@@ -2,11 +2,20 @@
 
 This project aims to implement the congruence closure algorithm with DAG to satisfy a set of equalities and disequalities in the quantifier-free fragment of the theory of equality.
 
-## How to run
+## How to run the first time
 
 - Insert file to test in folder 'data'
 - Run ```./run.sh```
 - Insert the name of the file (with extension) in the command line, when asked.
+
+### How to run following times
+
+You will only need to activate the environment, and then run the main script.
+
+```(bash)
+source ./venv/bin/activate
+python3 main.py
+```
 
 ## Type of accepted input
 
