@@ -35,7 +35,7 @@ This will be interpreted as 'f(a,b) = a & f(a,b) != a'
 
 ### SMT files
 
-Smt2 format is accepted only in AND with eachother.\
+Smt2 format is accepted only when formulas are in AND with eachother.\
 As for the text files, the formula is read as different equalities and disequalities in AND.
 
 Example of structure of a 'input.smt2' file:
