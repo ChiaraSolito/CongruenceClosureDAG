@@ -1,10 +1,51 @@
 # Congruence Closure DAG
 
-In this project you are to implement the congruence closure algorithm with DAG for the
-satisfiability of a set of equalities and disequalities in the quantifier-free fragment of the
-theory of equality.
+This project aims to implement the congruence closure algorithm with DAG to satisfy a set of equalities and disequalities in the quantifier-free fragment of the theory of equality.
 
-How to run:
+## How to run
 
 - Insert file to test in folder 'data'
 - Run ```./run.sh```
+- Insert the name of the file (with extension) in the command line, when asked.
+
+## Type of accepted input
+
+### Text files
+
+Files with '.txt' extension are accepted if they are presented in a DNF form.\
+Each equality and disequality to be in consider in the algorithm must be put on different lines.
+
+Example of structure of a 'input.txt' file:
+
+```(txt)
+    f(a,b) = a
+    f(a,b) != a
+```
+
+This will be interpreted as 'f(a,b) = a & f(a,b) != a'
+
+### SMT files
+
+Smt2 format is accepted only in DNF form.\
+As for the text files, the formula is read as different equalities and disequalities in AND.
+
+Example of structure of a 'input.smt2' file:
+
+```(smt2)
+    (set-info :smt-lib-version 2.6)
+    (set-logic QF_UF)
+    (set-info :source |
+    Source: The calcolus of computation (Bradley-Manna) 
+    Translator: Andrea Mangrella. |)
+    (set-info :category "crafted")
+    (set-info :status unsat)
+    (declare-sort S1 0)
+    (declare-fun a () S1)
+    (declare-fun b () S1)
+    (declare-fun f (S1 S1) S1)
+    (assert (let ((t1 (f a b)) (t2 (f t1 b ))) (and (= t1 a) (not (= t2 a) ))) )
+    (check-sat)
+    (exit)
+```
+
+This will be interpreted as 'f(a, b) = a & f(f(a, b), b) != a'. This precise example can be found in the data folder under the name of 'input1.smt2'.
