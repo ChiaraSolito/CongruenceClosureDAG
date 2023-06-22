@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from networkx.drawing.nx_pydot import graphviz_layout
 from itertools import combinations
 import copy 
+from copy import deepcopy
 
 class DAG: 
 
@@ -85,7 +86,7 @@ class DAG:
     
     def simplify(self,eq,diseq):
 
-        fns = [self.g.nodes[node]['fn'] for node in self.g.nodes]
+        fns = {self.g.nodes[node]['fn'] for node in self.g.nodes}
 
         #first simplify leaves
         for fn in fns:
@@ -103,7 +104,7 @@ class DAG:
                     diseq = [[newid,item[1]] if item[0] == node else [item[0],item[1]] for item in diseq]
                     diseq = [[item[0],newid] if item[1] == node else [item[0],item[1]] for item in diseq]
 
-                    for predecessor in predecessors:
+                    for predecessor in self.g.predecessors(node):
                         self.remove_edge(predecessor,node)
                     self.g.remove_node(node)
 
@@ -113,61 +114,72 @@ class DAG:
         #then simplify functions
         for fn in fns:
             non_leaves = [node for node in self.g.nodes if self.g.out_degree(node)>0 and self.g.nodes[node]["fn"] == fn]
-
+            comb = list(combinations(non_leaves,2))
             if len(non_leaves)>1:
-                graph_copy = self.g.copy()
 
                 #for each couple of nodes with the same fn
-                for (u,v) in combinations(non_leaves,2):
-                    #if they have the same list of successors we unify them
-                    if list(graph_copy.successors(u)) == list(graph_copy.successors(v)):
+                #for (u,v) in comb:
+                
+                i = 0
+                while i < len(comb):
 
-                        newid = self.add_node(fn,[])
+                    u,v = comb[i]
+                    if u in self.g.nodes() and v in self.g.nodes():
+                        #if they have the same list of successors we unify them
+                        if list(self.g.successors(u)) == list(self.g.successors(v)):
 
-                        predecessors = set()
+                            newid = self.add_node(fn,[])
 
-                        predecessors.update(graph_copy.predecessors(u))
-                        predecessors.update(graph_copy.predecessors(v))
+                            predecessors = set()
 
-                        for predecessor in predecessors:
-                            self.add_edge(predecessor, newid)
-                        for successor in graph_copy.successors(u):
-                            self.add_edge(newid,successor)
-                        
-                        #remove the node and substitute his id in the list of equalities
+                            predecessors.update(self.g.predecessors(u))
+                            predecessors.update(self.g.predecessors(v))
 
-                        if self.g.has_node(u):
+                            for predecessor in predecessors:
+                                self.add_edge(predecessor, newid)
+                            for successor in self.g.successors(u):
+                                self.add_edge(newid,successor)
                             
-                            eq = [[newid,item[1]] if item[0] == u else [item[0],item[1]] for item in eq]
-                            eq = [[item[0],newid] if item[1] == u else [item[0],item[1]] for item in eq]
+                            #remove the node and substitute his id in the list of equalities
 
-                            diseq = [[newid,item[1]] if item[0] == u else [item[0],item[1]] for item in diseq]
-                            diseq = [[item[0],newid] if item[1] == u else [item[0],item[1]] for item in diseq]
+                            if self.g.has_node(u):
+                                
+                                eq = [[newid,item[1]] if item[0] == u else [item[0],item[1]] for item in eq]
+                                eq = [[item[0],newid] if item[1] == u else [item[0],item[1]] for item in eq]
 
-                            #remove predecessor and successors
-                            for predecessor in graph_copy.predecessors(u):
-                                self.remove_edge(predecessor,u)
-                            for successor in graph_copy.successors(u):
-                                self.remove_edge(u,successor)
-                            self.g.remove_node(u)
+                                diseq = [[newid,item[1]] if item[0] == u else [item[0],item[1]] for item in diseq]
+                                diseq = [[item[0],newid] if item[1] == u else [item[0],item[1]] for item in diseq]
 
-                        #remove the node and substitute his id in the list of equalities
-                        if self.g.has_node(v):
+                                #remove predecessor and successors
+                                for predecessor in self.g.predecessors(u):
+                                    self.remove_edge(predecessor,u)
+                                for successor in self.g.successors(u):
+                                    self.remove_edge(u,successor)
+                                self.g.remove_node(u)
 
-                            eq = [[newid,item[1]] if item[0] == v else [item[0],item[1]] for item in eq]
-                            eq = [[item[0],newid] if item[1] == v else [item[0],item[1]] for item in eq]
+                            #remove the node and substitute his id in the list of equalities
+                            if self.g.has_node(v):
 
-                            diseq = [[newid,item[1]] if item[0] == v else [item[0],item[1]] for item in diseq]
-                            diseq = [[item[0],newid] if item[1] == v else [item[0],item[1]] for item in diseq]
+                                eq = [[newid,item[1]] if item[0] == v else [item[0],item[1]] for item in eq]
+                                eq = [[item[0],newid] if item[1] == v else [item[0],item[1]] for item in eq]
 
-                            #remove edges before removing nodes
-                            for predecessor in graph_copy.predecessors(v):
-                                self.remove_edge(predecessor,v)
-                            for successor in graph_copy.successors(v):
-                                self.remove_edge(v,successor)
-                            self.g.remove_node(v)
+                                diseq = [[newid,item[1]] if item[0] == v else [item[0],item[1]] for item in diseq]
+                                diseq = [[item[0],newid] if item[1] == v else [item[0],item[1]] for item in diseq]
 
-        return eq, diseq
+                                #remove edges before removing nodes
+                                for predecessor in self.g.predecessors(v):
+                                    self.remove_edge(predecessor,v)
+                                for successor in self.g.successors(v):
+                                    self.remove_edge(v,successor)
+                                self.g.remove_node(v)
+
+                            #update non_leaves and comb
+                            non_leaves = [node for node in self.g.nodes if self.g.out_degree(node)>0 and self.g.nodes[node]["fn"] == fn]    
+                            comb = list(combinations(non_leaves,2))
+                            i = -1
+                    i += 1   
+
+        return self.g, eq, diseq
 
     def print_graph(self):
         labels = nx.get_node_attributes(self.g, 'fn') 
