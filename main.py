@@ -75,6 +75,12 @@ if __name__ == "__main__":
     
     file = input('Please insert an input or h to get help: ')
     if file == 'h':
+        print('Type of accepted input:')
         print()
+        print("Files with '.txt' extension are accepted if they are presented in AND with each other.\nEach equality and disequality to be in consider in the algorithm must be put on different lines.")
+        print()
+        print("Smt2 format is accepted only when formulas are in AND with eachother.\nAs for the text files, the formula is read as different equalities and disequalities in AND.")
+        print()
+        print("Please copy your input file in the 'data' folder and then input it as 'name.ext'")
     else:
         main(file)
