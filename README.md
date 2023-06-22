@@ -2,6 +2,11 @@
 
 This project aims to implement the congruence closure algorithm with DAG to satisfy a set of equalities and disequalities in the quantifier-free fragment of the theory of equality.
 
+## Requirments
+
+To run the algorithm it is required to have installed [Python3](https://www.python.org/downloads/)\
+Better if version 3.11.
+
 ## How to run the first time
 
 - Insert file to test in folder 'data'
@@ -30,6 +35,11 @@ Example of structure of a 'input.txt' file:
     f(a,b) = a
     f(a,b) != a
 ```
+
+### Important for text files
+
+- All equalities and inequalities in AND.
+- No brackets around the outermost symbols.
 
 This will be interpreted as 'f(a,b) = a & f(a,b) != a'
 
