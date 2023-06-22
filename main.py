@@ -28,11 +28,14 @@ def main(name:str):
     if file.endswith('.smt2'):
         smt = SmtParser()
         input = smt.parse(file)
-        print(input)
+        form = ' & '.join(input)
+        print(f'Final form of the input is: {form}')
     else:
         input = process(file)
+        form = ' & '.join(input)
+        print(f'Final form of the input is: {form}')
     
-    eq, diseq = parser.parse_formula(input)
+    dag.g, eq, diseq = parser.parse_formula(input)
 
     # merge of all node that are in equivalence relation
     satisfiable = True
@@ -62,7 +65,9 @@ def main(name:str):
 if __name__ == "__main__":
 
     #start procedure
-    if len(sys.argv)>1:
-        main(sys.argv[1])    
+    
+    file = input('Please insert an input or h to get help: ')
+    if file == 'h':
+        print()
     else:
-        print('Please insert an input.')
+        main(file)
