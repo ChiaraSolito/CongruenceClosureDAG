@@ -88,25 +88,25 @@ The main function elaborates the input and then gives it to the parser. If the i
 The parser takes in input the empty graph structure and then builds it, when function \texttt{parse$\_$formula} gets called. 
 If for example we give to the parser:
 $$f(a,b) = a \land f(f(a,b),b) \neq a$$
-the first instance of the graph generated, and given in output will be:
+the first instance of the graph generated, and given in output will be as in Figure 1.
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[scale=0.45]{Figure_1.png}
+    \includegraphics[scale=0.4]{Figure_1.png}
     \caption{DAG representation.}
     \label{fig:enter-label}
 \end{figure}
 
-For each couple in the equation list we call the merge function, then for each inequality we check the find of each literal in the couple. If we find an inequality of the form $t_1 \neq s_1$ for which $t_1.find() = s_1.find()$ we can say that the formula is unsatisfiable. The final graph for the formula we've seen before will be:
+For each couple in the equation list we call the merge function, then for each inequality we check the find of each literal in the couple. If we find an inequality of the form $t_1 \neq s_1$ for which $t_1.find() = s_1.find()$ we can say that the formula is unsatisfiable.\\ The final graph for the formula we've seen before will be as in Figure 2. This formula is unsatisfiable.
 
-\begin{figure}[!htbp]
+\begin{figure}[!htpb]
     \centering
-    \includegraphics[scale=0.6]{Figure_2.png}
+    \includegraphics[scale=0.55]{Figure_2.png}
     \caption{figure}{DAG representation with find.}
     \label{fig:enter-label}
 \end{figure}
 
-This formula is unsatisfiable.
+\newpage
 \section{Accepted Input}
 
 \subsection{Text files}
