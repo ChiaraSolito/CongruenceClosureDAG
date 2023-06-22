@@ -1,6 +1,0 @@
-f(g,h) = d
-c = d
-f(g,d) = a
-e = c
-e = b
-b = h

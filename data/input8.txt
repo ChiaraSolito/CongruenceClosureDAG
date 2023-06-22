@@ -1,3 +1,6 @@
-f(f(f(a))) = a
-f(f(f(f(f(a))))) = a
-f(a) != a
+f(g,h) = d
+c = d
+f(g,d) = a
+e = c
+e = b
+b = h
