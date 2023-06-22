@@ -58,12 +58,14 @@ class DAG:
         ris = False
         n1 = self.node(i1)
         n2 = self.node(i2)
+
         if n1["fn"] == n2["fn"] and len(n1["args"]) == len(n2["args"]):
             for a in range(0,len(n1["args"])):
                 if self.find(n1["args"][a]) == self.find(n2["args"][a]):
                     ris = True
                 else:
                     ris = False
+                    break
         return ris
     
     def merge(self, i1:UUID, i2:UUID):
