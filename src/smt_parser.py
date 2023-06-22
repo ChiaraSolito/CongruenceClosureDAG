@@ -11,7 +11,6 @@ class SmtParser():
         f = script.get_strict_formula()
 
         result = [cmd for cmd in script.commands if ((cmd.name == "set-info") and (":status" in cmd.args))]
-        ground_truth = result[0].args[1]
 
         assert len(result) <= 1
         assert script.count_command_occurrences("assert") >= 1
@@ -20,18 +19,31 @@ class SmtParser():
         formulas = f.serialize()
         formulas = formulas[1:] 
         formulas = formulas[:-1]
-        print(formulas)
 
-        if '(! (' in formulas:
-            formulas = formulas.replace('(! ','')
-            formulas = formulas[:-1] 
-
+        final_formulas = []
         #formulas.remove
         if '&' in formulas:
             couple = re.split('&', formulas)
-            couple[0] = couple[0][1:]
-            couple[0] = couple[0][:-2]
-            couple[1] = couple[1][2:]
-            couple[1] = couple[1][:-1]
 
-        return couple
+            for c in couple:
+                c = c.strip(' ')
+                
+                if '! ' in c:
+                    c = c.replace('=','!=')
+                    c = c[3:]
+                    c = c[:-1]
+                c = c.strip('(')
+                c = c.strip(')')
+                final_formulas.append(c) 
+
+        else:
+
+            if '! ' in formulas:
+                formulas = formulas.replace('=','!=')
+                formulas = formulas[3:]
+                formulas = formulas[:-1]
+            c = c.strip('(')
+            c = c.strip(')')
+            final_formulas.append(c) 
+
+        return final_formulas
