@@ -2,7 +2,6 @@ from src.dag import DAG
 from src.parser import Parser
 from src.smt_parser import SmtParser
 import time
-import sys 
 
 def process(file:str):
     with open(file) as f:

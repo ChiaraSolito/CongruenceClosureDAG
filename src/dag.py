@@ -3,8 +3,7 @@ from uuid import uuid4, UUID
 import matplotlib.pyplot as plt
 from networkx.drawing.nx_pydot import graphviz_layout
 from itertools import combinations
-import copy 
-from copy import deepcopy
+import copy
 
 class DAG: 
 
